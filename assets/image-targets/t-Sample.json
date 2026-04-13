@@ -1,0 +1,17 @@
+{
+  "imagePath": "assets/image-targets/t-Sample_luminance.png",
+  "name": "t-Sample",
+  "type": "FLAT",
+  "properties": {
+    "left": 0,
+    "top": 0,
+    "width": 900,
+    "height": 1200,
+    "isRotated": false,
+    "originalWidth": 900,
+    "originalHeight": 1200
+  },
+  "metadata": null,
+  "created": 1776060318751,
+  "updated": 1776060318751
+}

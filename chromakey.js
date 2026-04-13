@@ -3,9 +3,46 @@
  * - Android : assets/output-01.webm (알파채널 내장, 크로마키 없음)
  * - iOS/기타: assets/t-final.mp4    (크로마키 셰이더 적용)
  *
- * 핵심 수정: 8th Wall ECS의 일반 Texture를 THREE.VideoTexture로 교체
- *            → 매 프레임 자동 업데이트 보장 (영상이 실제로 보임)
+ * 이미지 트래킹: assets/image-targets/t-Sample.json 을 XrController에 주입
  */
+
+// ── 이미지 타겟 데이터 주입 ────────────────────────────────────────────────────
+// bundle.js 가 xrloaded 에서 XrController.configure({imageTargetData:[]}) 를 호출하기 전에
+// configure 를 가로채 컴파일된 타겟 데이터를 넣어준다.
+(function () {
+  'use strict';
+
+  var targetDataPromise = fetch('./assets/image-targets/t-Sample.json')
+    .then(function (r) { return r.json(); })
+    .catch(function (e) { console.error('[ImageTarget] JSON 로드 실패:', e); return null; });
+
+  function interceptConfigure() {
+    if (!window.XR8 || !XR8.XrController) return;
+
+    var _orig = XR8.XrController.configure.bind(XR8.XrController);
+
+    XR8.XrController.configure = function (opts) {
+      opts = opts || {};
+      targetDataPromise.then(function (data) {
+        if (data) {
+          opts.imageTargetData = [data];
+          console.log('[ImageTarget] imageTargetData 주입 완료:', data.name);
+        }
+        _orig(opts);
+      });
+    };
+
+    console.log('[ImageTarget] XrController.configure 인터셉트 완료');
+  }
+
+  if (window.XR8 && XR8.XrController) {
+    interceptConfigure();
+  } else {
+    window.addEventListener('xrloaded', interceptConfigure);
+  }
+})();
+// ─────────────────────────────────────────────────────────────────────────────
+
 (function () {
   'use strict';
 
