@@ -49,6 +49,7 @@
     'varying vec2 vUv;' +
     'void main(){' +
     '  vec4 c=texture2D(map,vUv);' +
+    '  c.rgb=pow(c.rgb,vec3(2.2));' +
     '  float Y1=0.299*keyColor.r+0.587*keyColor.g+0.114*keyColor.b;' +
     '  float Cr1=keyColor.r-Y1;float Cb1=keyColor.b-Y1;' +
     '  float Y2=0.299*c.r+0.587*c.g+0.114*c.b;' +
@@ -60,6 +61,7 @@
     '  c.r+=spillVal*0.5*spill*(1.0-spillMask);' +
     '  c.b+=spillVal*0.5*spill*(1.0-spillMask);' +
     '  c.g-=spillVal    *spill*(1.0-spillMask);' +
+    '  c.rgb=pow(c.rgb,vec3(1.0/2.2));' +
     '  gl_FragColor=vec4(c.rgb,a);' +
     '}';
 
@@ -142,9 +144,11 @@
       },
       vertexShader:   vertSrc,
       fragmentShader: fragSrc,
-      transparent:    true,
-      side:           THREE.DoubleSide,
-      depthWrite:     false
+      transparent:        true,
+      depthWrite:         false,
+      blending:           THREE.NormalBlending,
+      premultipliedAlpha: false,
+      side:               THREE.DoubleSide
     });
 
     mat.dispose();
