@@ -55,11 +55,11 @@
     '  float Cr2=c.r-Y2;float Cb2=c.b-Y2;' +
     '  float d=sqrt((Cr2-Cr1)*(Cr2-Cr1)+(Cb2-Cb1)*(Cb2-Cb1));' +
     '  float a=smoothstep(similarity,similarity+smoothness,d);' +
-    // 스필 억제: 과잉 녹색을 r/b 평균으로 대체
+    // 스필 억제: 불투명 경계 픽셀의 과잉 녹색을 r/b로 재분배
     '  float excess=max(0.0, c.g*2.0-c.r-c.b);' +
-    '  c.r+=excess*0.5*spill*(1.0-a);' +
-    '  c.g-=excess    *spill*(1.0-a);' +
-    '  c.b+=excess*0.5*spill*(1.0-a);' +
+    '  c.r+=excess*0.5*spill;' +
+    '  c.g-=excess    *spill;' +
+    '  c.b+=excess*0.5*spill;' +
     '  gl_FragColor=vec4(c.rgb,a);' +
     '}';
 
@@ -180,7 +180,10 @@
         {
           event: 'reality.imagelost',
           process: function () {
-            // 인식 소실돼도 영상 계속 재생 (루프)
+            var obj = findPlaneMesh();
+            if (obj && obj.material && obj.material.uniforms) {
+              obj.material.uniforms.map.value.image.pause();
+            }
           }
         }
       ],
