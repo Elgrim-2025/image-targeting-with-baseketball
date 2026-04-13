@@ -55,11 +55,11 @@
     '  float Cr2=c.r-Y2;float Cb2=c.b-Y2;' +
     '  float d=sqrt((Cr2-Cr1)*(Cr2-Cr1)+(Cb2-Cb1)*(Cb2-Cb1));' +
     '  float a=smoothstep(similarity,similarity+smoothness,d);' +
-    // 스필 억제: 불투명 경계 픽셀의 과잉 녹색을 r/b로 재분배
-    '  float excess=max(0.0, c.g*2.0-c.r-c.b);' +
-    '  c.r+=excess*0.5*spill*(1.0-a);' +
-    '  c.g-=excess    *spill*(1.0-a);' +
-    '  c.b+=excess*0.5*spill*(1.0-a);' +
+    '  float spillMask=smoothstep(similarity*0.5,similarity,d);' +
+    '  float spillVal=max(0.0,c.g-max(c.r,c.b));' +
+    '  c.r+=spillVal*0.5*spill*(1.0-spillMask);' +
+    '  c.b+=spillVal*0.5*spill*(1.0-spillMask);' +
+    '  c.g-=spillVal    *spill*(1.0-spillMask);' +
     '  gl_FragColor=vec4(c.rgb,a);' +
     '}';
 
