@@ -1,25 +1,20 @@
-<!doctype html><html><head><meta charset="UTF-8"><script>(function(){var userAgent=navigator.userAgent.toLowerCase();var currentUrl=window.location.href;var isInAppBrowser=/kakaotalk|naver|instagram|fbav|fb_iab/i.test(userAgent);if(isInAppBrowser){var isAndroid=/android/i.test(userAgent);var isIOS=/iphone|ipad|ipod/i.test(userAgent);if(/kakaotalk/i.test(userAgent)){window.location.href='kakaotalk://web/openExternal?url='+encodeURIComponent(currentUrl);}else if(isAndroid){var intentUrl='intent://'+currentUrl.replace(/https?:\/\//,'')+'#Intent;scheme=https;package=com.android.chrome;end';window.location.href=intentUrl;}else if(isIOS){document.addEventListener('DOMContentLoaded',function(){var guideHtml='<div id="browserGuide" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;"><div style="background:white;padding:30px;border-radius:12px;max-width:320px;text-align:center;margin:20px;"><h3 style="margin-bottom:15px;font-size:18px;">외부 브라우저에서 열어주세요</h3><p style="color:#666;font-size:14px;line-height:1.6;margin-bottom:20px;">Google 로그인은 보안상의 이유로<br>인앱 브라우저에서 지원되지 않습니다.<br><br><strong>우측 상단 메뉴(⋮)에서<br>"다른 브라우저로 열기"를 선택해주세요.</strong></p><button onclick="document.getElementById(\'browserGuide\').style.display=\'none\'" style="background:#4285f4;color:white;border:none;padding:12px 30px;border-radius:6px;cursor:pointer;font-size:14px;">확인</button></div></div>';document.body.insertAdjacentHTML('beforeend',guideHtml);});}}})();</script><meta name="viewport" content="width=device-width,initial-scale=1"><title>Empty Project</title><meta itemprop="name" content="Image Targets"><meta name="twitter:title" content="Image Targets"><meta property="og:title" content="Image Targets"><meta property="og:site_name" content="Image Targets"><meta name="description" content="Start with a blank project."><meta itemprop="description" content="Start with a blank project."><meta property="og:description" content="Start with a blank project."><meta name="twitter:description" content="Start with a blank project."><script crossorigin="anonymous" src="./external/runtime/runtime.js"></script><script crossorigin="anonymous" src="./external/xr/xr.js" async="true" data-preload-chunks="face, slam"></script></head><body><style>
-#sound-prompt{position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.62);color:#fff;font-family:sans-serif;font-size:15px;padding:12px 24px;border-radius:999px;pointer-events:none;z-index:9999;display:flex;align-items:center;gap:10px;white-space:nowrap;transition:opacity .4s}
-#sound-prompt svg{flex-shrink:0}
-</style>
-<div id="sound-prompt">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
-  화면을 터치하면 소리가 켜집니다
-</div>
-<script>
+<!doctype html><html><head><meta charset="UTF-8"><script>(function(){var userAgent=navigator.userAgent.toLowerCase();var currentUrl=window.location.href;var isInAppBrowser=/kakaotalk|naver|instagram|fbav|fb_iab/i.test(userAgent);if(isInAppBrowser){var isAndroid=/android/i.test(userAgent);var isIOS=/iphone|ipad|ipod/i.test(userAgent);if(/kakaotalk/i.test(userAgent)){window.location.href='kakaotalk://web/openExternal?url='+encodeURIComponent(currentUrl);}else if(isAndroid){var intentUrl='intent://'+currentUrl.replace(/https?:\/\//,'')+'#Intent;scheme=https;package=com.android.chrome;end';window.location.href=intentUrl;}else if(isIOS){document.addEventListener('DOMContentLoaded',function(){var guideHtml='<div id="browserGuide" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;"><div style="background:white;padding:30px;border-radius:12px;max-width:320px;text-align:center;margin:20px;"><h3 style="margin-bottom:15px;font-size:18px;">외부 브라우저에서 열어주세요</h3><p style="color:#666;font-size:14px;line-height:1.6;margin-bottom:20px;">Google 로그인은 보안상의 이유로<br>인앱 브라우저에서 지원되지 않습니다.<br><br><strong>우측 상단 메뉴(⋮)에서<br>"다른 브라우저로 열기"를 선택해주세요.</strong></p><button onclick="document.getElementById(\'browserGuide\').style.display=\'none\'" style="background:#4285f4;color:white;border:none;padding:12px 30px;border-radius:6px;cursor:pointer;font-size:14px;">확인</button></div></div>';document.body.insertAdjacentHTML('beforeend',guideHtml);});}}})();</script><meta name="viewport" content="width=device-width,initial-scale=1"><title>Empty Project</title><meta itemprop="name" content="Image Targets"><meta name="twitter:title" content="Image Targets"><meta property="og:title" content="Image Targets"><meta property="og:site_name" content="Image Targets"><meta name="description" content="Start with a blank project."><meta itemprop="description" content="Start with a blank project."><meta property="og:description" content="Start with a blank project."><meta name="twitter:description" content="Start with a blank project."><script crossorigin="anonymous" src="./external/runtime/runtime.js"></script><script crossorigin="anonymous" src="./external/xr/xr.js" async="true" data-preload-chunks="face, slam"></script></head><body><script>
+// 카메라 권한 버튼(첫 터치)에서 오디오 컨텍스트 unlock
 (function(){
-  var el = document.getElementById('sound-prompt');
   var unlocked = false;
   function unlock(){
     if(unlocked) return;
     unlocked = true;
-    // 재생 중인 모든 video 소리 켜기
-    document.querySelectorAll('video').forEach(function(v){ v.muted = false; v.play && v.play().catch(function(){}); });
-    el.style.opacity = '0';
-    setTimeout(function(){ el.style.display = 'none'; }, 400);
+    // 더미 AudioContext resume으로 브라우저 오디오 정책 해제
+    try {
+      var ctx = new (window.AudioContext || window.webkitAudioContext)();
+      ctx.resume().then(function(){ ctx.close(); });
+    } catch(e){}
+    // 이미 생성된 video가 있으면 mute 해제
+    document.querySelectorAll('video').forEach(function(v){ v.muted = false; });
   }
-  document.addEventListener('touchstart', unlock, {once: true});
-  document.addEventListener('click',      unlock, {once: true});
+  document.addEventListener('touchstart', unlock, {once:true, capture:true});
+  document.addEventListener('click',      unlock, {once:true, capture:true});
 })();
 </script>
 <script src="chromakey.js"></script><script src="bundle.js"></script></body></html>
