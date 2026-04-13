@@ -56,9 +56,7 @@
     '  float d=sqrt((Cr2-Cr1)*(Cr2-Cr1)+(Cb2-Cb1)*(Cb2-Cb1));' +
     '  float a=smoothstep(similarity,similarity+smoothness,d);' +
     '  float spillVal=max(0.0,c.g-max(c.r,c.b));' +
-    '  c.r=clamp(c.r+spillVal*0.5*spill,0.0,1.0);' +
-    '  c.b=clamp(c.b+spillVal*0.5*spill,0.0,1.0);' +
-    '  c.g=clamp(c.g-spillVal*spill,0.0,1.0);' +
+    '  a=min(a,1.0-clamp(spillVal*spill,0.0,1.0));' +
     '  gl_FragColor=vec4(c.rgb,a);' +
     '}';
 
