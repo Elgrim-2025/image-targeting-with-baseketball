@@ -114,6 +114,10 @@
 
     var vid = mat.map.image;
 
+    // 씬 로드 시 자동재생 즉시 차단
+    vid.pause();
+    vid.currentTime = 0;
+
     // VideoTexture 새로 생성 (매 프레임 자동 갱신 보장)
     var vTex = new THREE.VideoTexture(vid);
     vTex.minFilter = THREE.LinearFilter;
@@ -151,6 +155,13 @@
           process: function (e) {
             console.log('[CK] 이미지 인식:', e && e.detail && e.detail.name);
             applyShader();
+            var obj = findPlaneMesh();
+            if (obj && obj.material && obj.material.uniforms) {
+              var vid = obj.material.uniforms.map.value.image;
+              vid.muted = false;
+              vid.currentTime = 0;
+              vid.play().catch(function () {});
+            }
           }
         },
         {
@@ -159,7 +170,13 @@
         },
         {
           event: 'reality.imagelost',
-          process: function () { console.log('[CK] 이미지 소실'); }
+          process: function () {
+            console.log('[CK] 이미지 소실');
+            var obj = findPlaneMesh();
+            if (obj && obj.material && obj.material.uniforms) {
+              obj.material.uniforms.map.value.image.pause();
+            }
+          }
         }
       ],
 
