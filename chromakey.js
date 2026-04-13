@@ -29,7 +29,7 @@
   var KEY_B      = 0.0;
   var SIMILARITY = 0.35;
   var SMOOTHNESS = 0.08;
-  var SPILL      = 1.0;   // 녹색 번짐 억제 강도 (0.0 ~ 1.0)
+  var SPILL      = 0.7;   // 녹색 번짐 억제 강도 (0.0 ~ 1.0)
   // ════════════════════════════════════════════════════════════════
 
   // bundle.js 씬 데이터의 plane 엔티티 ID (이걸로 메시를 확실하게 찾음)
@@ -57,9 +57,9 @@
     '  float a=smoothstep(similarity,similarity+smoothness,d);' +
     // 스필 억제: 불투명 경계 픽셀의 과잉 녹색을 r/b로 재분배
     '  float excess=max(0.0, c.g*2.0-c.r-c.b);' +
-    '  c.r+=excess*0.5*spill;' +
-    '  c.g-=excess    *spill;' +
-    '  c.b+=excess*0.5*spill;' +
+    '  c.r+=excess*0.5*spill*(1.0-a);' +
+    '  c.g-=excess    *spill*(1.0-a);' +
+    '  c.b+=excess*0.5*spill*(1.0-a);' +
     '  gl_FragColor=vec4(c.rgb,a);' +
     '}';
 
