@@ -158,8 +158,8 @@
             var obj = findPlaneMesh();
             if (obj && obj.material && obj.material.uniforms) {
               var vid = obj.material.uniforms.map.value.image;
+              vid.loop = true;
               vid.muted = false;
-              vid.currentTime = 0;
               vid.play().catch(function () {});
             }
           }
@@ -171,11 +171,7 @@
         {
           event: 'reality.imagelost',
           process: function () {
-            console.log('[CK] 이미지 소실');
-            var obj = findPlaneMesh();
-            if (obj && obj.material && obj.material.uniforms) {
-              obj.material.uniforms.map.value.image.pause();
-            }
+            // 인식 소실돼도 영상 계속 재생 (루프)
           }
         }
       ],
