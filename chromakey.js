@@ -29,6 +29,7 @@
   var KEY_B      = 0.0;
   var SIMILARITY = 0.35;
   var SMOOTHNESS = 0.08;
+  var SPILL      = 0.7;   // 녹색 번짐 억제 강도 (0.0 ~ 1.0)
   // ════════════════════════════════════════════════════════════════
 
   // bundle.js 씬 데이터의 plane 엔티티 ID (이걸로 메시를 확실하게 찾음)
@@ -44,6 +45,7 @@
     'uniform vec3 keyColor;' +
     'uniform float similarity;' +
     'uniform float smoothness;' +
+    'uniform float spill;' +
     'varying vec2 vUv;' +
     'void main(){' +
     '  vec4 c=texture2D(map,vUv);' +
@@ -52,7 +54,13 @@
     '  float Y2=0.299*c.r+0.587*c.g+0.114*c.b;' +
     '  float Cr2=c.r-Y2;float Cb2=c.b-Y2;' +
     '  float d=sqrt((Cr2-Cr1)*(Cr2-Cr1)+(Cb2-Cb1)*(Cb2-Cb1));' +
-    '  gl_FragColor=vec4(c.rgb,smoothstep(similarity,similarity+smoothness,d));' +
+    '  float a=smoothstep(similarity,similarity+smoothness,d);' +
+    // 스필 억제: 과잉 녹색을 r/b 평균으로 대체
+    '  float excess=max(0.0, c.g*2.0-c.r-c.b);' +
+    '  c.r+=excess*0.5*spill*(1.0-a);' +
+    '  c.g-=excess    *spill*(1.0-a);' +
+    '  c.b+=excess*0.5*spill*(1.0-a);' +
+    '  gl_FragColor=vec4(c.rgb,a);' +
     '}';
 
   var applied = false;
@@ -129,7 +137,8 @@
         map:        { value: vTex },
         keyColor:   { value: new THREE.Color(KEY_R, KEY_G, KEY_B) },
         similarity: { value: SIMILARITY },
-        smoothness: { value: SMOOTHNESS }
+        smoothness: { value: SMOOTHNESS },
+        spill:      { value: SPILL }
       },
       vertexShader:   vertSrc,
       fragmentShader: fragSrc,
