@@ -52,7 +52,11 @@
   padding:16px 16px 36px;box-sizing:border-box;
 }
 #capture-preview{
-  width:100%;border-radius:12px;display:block;margin-bottom:14px;
+  width:100%;border-radius:12px;display:block;margin-bottom:8px;
+}
+#ios-save-hint{
+  display:none;text-align:center;color:#8e8e93;
+  font-family:sans-serif;font-size:13px;margin-bottom:10px;
 }
 .cap-row{display:flex;gap:10px}
 .cap-btn{
@@ -73,6 +77,7 @@
 <div id="capture-modal">
   <div id="capture-sheet">
     <img id="capture-preview" src="" alt="">
+    <p id="ios-save-hint">이미지를 꾹 눌러 갤러리에 저장하세요</p>
     <div class="cap-row">
       <button class="cap-btn" id="btn-save">저장</button>
       <button class="cap-btn" id="btn-share">공유</button>
@@ -89,10 +94,18 @@
   var btnSave    = document.getElementById('btn-save');
   var btnShare   = document.getElementById('btn-share');
   var btnCancel  = document.getElementById('btn-cancel');
+  var iosSaveHint = document.getElementById('ios-save-hint');
   var lastBlob   = null;
 
+  var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
+  // iOS에서는 힌트 표시, 저장 버튼은 공유 시트로 연결
+  if(isIOS){
+    iosSaveHint.style.display = 'block';
+    btnSave.textContent = '저장';
+  }
+
   function getARCanvas(){
-    // 8th Wall이 렌더링하는 캔버스 (가장 큰 캔버스)
     var canvases = document.querySelectorAll('canvas');
     var best = null;
     canvases.forEach(function(c){
@@ -105,7 +118,6 @@
     var canvas = getARCanvas();
     if(!canvas){ alert('캔버스를 찾을 수 없습니다.'); return; }
 
-    // preserveDrawingBuffer 없이도 requestAnimationFrame 타이밍에 맞춰 캡처
     requestAnimationFrame(function(){
       canvas.toBlob(function(blob){
         if(!blob){ alert('캡처 실패'); return; }
@@ -116,7 +128,8 @@
     });
   }
 
-  function save(){
+  function saveNative(){
+    // 비 iOS: 파일 다운로드
     if(!lastBlob) return;
     var url = URL.createObjectURL(lastBlob);
     var a = document.createElement('a');
@@ -126,14 +139,23 @@
     setTimeout(function(){ URL.revokeObjectURL(url); }, 3000);
   }
 
-  function share(){
+  function shareFile(){
     if(!lastBlob) return;
     var file = new File([lastBlob], 'capture.jpg', {type:'image/jpeg'});
     if(navigator.canShare && navigator.canShare({files:[file]})){
       navigator.share({files:[file]}).catch(function(){});
     } else {
-      // 공유 불가 환경 → 저장으로 폴백
-      save();
+      saveNative();
+    }
+  }
+
+  function onSave(){
+    if(isIOS){
+      // iOS: 공유 시트 열기 → "사진에 저장" 선택 가능
+      shareFile();
+    } else {
+      saveNative();
+      close();
     }
   }
 
@@ -143,8 +165,8 @@
   }
 
   captureBtn.addEventListener('click', capture);
-  btnSave  .addEventListener('click', function(){ save();  close(); });
-  btnShare .addEventListener('click', function(){ share(); close(); });
+  btnSave  .addEventListener('click', onSave);
+  btnShare .addEventListener('click', function(){ shareFile(); });
   btnCancel.addEventListener('click', close);
   modal    .addEventListener('click', function(e){ if(e.target===modal) close(); });
 })();
