@@ -29,4 +29,125 @@
   document.addEventListener('click',      unlock, {once:true, capture:true});
 })();
 </script>
-<script src="chromakey.js"></script><script src="bundle.js"></script></body></html>
+<script src="chromakey.js"></script><script src="bundle.js"></script>
+
+<style>
+#capture-btn{
+  position:fixed;bottom:40px;left:50%;transform:translateX(-50%);
+  z-index:8000;padding:12px 36px;
+  background:rgba(255,255,255,0.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1.5px solid rgba(255,255,255,0.55);border-radius:999px;
+  color:#fff;font-family:sans-serif;font-size:16px;font-weight:600;letter-spacing:.04em;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;
+}
+#capture-btn:active{background:rgba(255,255,255,0.32)}
+
+#capture-modal{
+  display:none;position:fixed;inset:0;z-index:9000;
+  background:rgba(0,0,0,0.72);align-items:flex-end;justify-content:center;
+}
+#capture-modal.show{display:flex}
+#capture-sheet{
+  width:100%;max-width:480px;background:#1c1c1e;border-radius:18px 18px 0 0;
+  padding:16px 16px 36px;box-sizing:border-box;
+}
+#capture-preview{
+  width:100%;border-radius:12px;display:block;margin-bottom:14px;
+}
+.cap-row{display:flex;gap:10px}
+.cap-btn{
+  flex:1;padding:14px 0;border:none;border-radius:12px;
+  font-family:sans-serif;font-size:15px;font-weight:600;cursor:pointer;
+}
+#btn-save{background:#2c2c2e;color:#fff}
+#btn-share{background:#0a84ff;color:#fff}
+#btn-cancel{
+  width:100%;margin-top:8px;padding:14px 0;border:none;border-radius:12px;
+  background:#2c2c2e;color:#eb4d3d;
+  font-family:sans-serif;font-size:15px;font-weight:600;cursor:pointer;
+}
+</style>
+
+<button id="capture-btn">촬영</button>
+
+<div id="capture-modal">
+  <div id="capture-sheet">
+    <img id="capture-preview" src="" alt="">
+    <div class="cap-row">
+      <button class="cap-btn" id="btn-save">저장</button>
+      <button class="cap-btn" id="btn-share">공유</button>
+    </div>
+    <button id="btn-cancel">취소</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var captureBtn = document.getElementById('capture-btn');
+  var modal      = document.getElementById('capture-modal');
+  var preview    = document.getElementById('capture-preview');
+  var btnSave    = document.getElementById('btn-save');
+  var btnShare   = document.getElementById('btn-share');
+  var btnCancel  = document.getElementById('btn-cancel');
+  var lastBlob   = null;
+
+  function getARCanvas(){
+    // 8th Wall이 렌더링하는 캔버스 (가장 큰 캔버스)
+    var canvases = document.querySelectorAll('canvas');
+    var best = null;
+    canvases.forEach(function(c){
+      if(!best || c.width * c.height > best.width * best.height) best = c;
+    });
+    return best;
+  }
+
+  function capture(){
+    var canvas = getARCanvas();
+    if(!canvas){ alert('캔버스를 찾을 수 없습니다.'); return; }
+
+    // preserveDrawingBuffer 없이도 requestAnimationFrame 타이밍에 맞춰 캡처
+    requestAnimationFrame(function(){
+      canvas.toBlob(function(blob){
+        if(!blob){ alert('캡처 실패'); return; }
+        lastBlob = blob;
+        preview.src = URL.createObjectURL(blob);
+        modal.classList.add('show');
+      }, 'image/jpeg', 0.95);
+    });
+  }
+
+  function save(){
+    if(!lastBlob) return;
+    var url = URL.createObjectURL(lastBlob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'capture_' + Date.now() + '.jpg';
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 3000);
+  }
+
+  function share(){
+    if(!lastBlob) return;
+    var file = new File([lastBlob], 'capture.jpg', {type:'image/jpeg'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      navigator.share({files:[file]}).catch(function(){});
+    } else {
+      // 공유 불가 환경 → 저장으로 폴백
+      save();
+    }
+  }
+
+  function close(){
+    modal.classList.remove('show');
+    if(lastBlob){ URL.revokeObjectURL(preview.src); lastBlob = null; }
+  }
+
+  captureBtn.addEventListener('click', capture);
+  btnSave  .addEventListener('click', function(){ save();  close(); });
+  btnShare .addEventListener('click', function(){ share(); close(); });
+  btnCancel.addEventListener('click', close);
+  modal    .addEventListener('click', function(e){ if(e.target===modal) close(); });
+})();
+</script>
+
+</body></html>
